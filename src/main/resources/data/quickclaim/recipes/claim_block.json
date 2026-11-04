@@ -1,0 +1,28 @@
+{
+  "key": {
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "L": {
+      "item": "minecraft:lectern"
+    },
+    "B": {
+      "item": "minecraft:book"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ABA",
+    " L ",
+    "GCG"
+  ],
+  "result": {
+    "item": "quickclaim:claim_block"
+  }
+}

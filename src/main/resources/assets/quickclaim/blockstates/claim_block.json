@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "quickclaim:block/claim_block",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "quickclaim:block/claim_block",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "quickclaim:block/claim_block",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "quickclaim:block/claim_block"
+    }
+  }
+}

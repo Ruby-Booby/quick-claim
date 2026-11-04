@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+}
+
+group = mod_group_id
+version = mod_version
+base.archivesName = mod_id
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            mods {
+                quickclaim { source sourceSets.main }
+            }
+        }
+        client {}
+        server { args '--nogui' }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+tasks.named('processResources', ProcessResources) {
+    def properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version]
+    inputs.properties properties
+    filesMatching('META-INF/mods.toml') { expand properties }
+}
+
+tasks.named('jar', Jar) {
+    manifest.attributes('Implementation-Version': project.version)
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

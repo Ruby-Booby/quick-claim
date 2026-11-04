@@ -1,0 +1,15 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_lectern": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": { "items": [{ "items": ["minecraft:lectern"] }] }
+    },
+    "has_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": { "recipe": "quickclaim:claim_block" }
+    }
+  },
+  "requirements": [["has_lectern", "has_recipe"]],
+  "rewards": { "recipes": ["quickclaim:claim_block"] }
+}
