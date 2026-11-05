@@ -13,6 +13,7 @@ minecraft {
     runs {
         configureEach {
             workingDirectory project.file('run')
+            args '--mixin.config', 'quickclaim.mixins.json'
             mods {
                 quickclaim { source sourceSets.main }
             }
@@ -33,7 +34,7 @@ tasks.named('processResources', ProcessResources) {
 }
 
 tasks.named('jar', Jar) {
-    manifest.attributes('Implementation-Version': project.version)
+    manifest.attributes('Implementation-Version': project.version, 'MixinConfigs': 'quickclaim.mixins.json')
     preserveFileTimestamps = false
     reproducibleFileOrder = true
     finalizedBy 'reobfJar'

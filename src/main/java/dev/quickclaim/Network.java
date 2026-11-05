@@ -92,8 +92,8 @@ public final class Network {
                             case 1 -> Management.act(p, "personal", "", "");
                             case 2 -> Management.act(p, "factionClaim", "", "");
                             case 3 -> Management.act(p, "payments", "", "");
-                            case 4 -> ping(p, false);
-                            case 5 -> ping(p, true);
+                            case 4 -> ClaimNavigation.ping(p, false);
+                            case 5 -> ClaimNavigation.ping(p, true);
                             case 6 -> {
                                 int now = p.server.getTickCount();
                                 var last = LAST_ATLAS.get(p.getUUID());
@@ -244,36 +244,5 @@ public final class Network {
         t.putBoolean("FactionOwner", f != null && f.owner.equals(p.getUUID()));
         Management.populate(p, t);
         for (var packet : DashboardTransfer.packets(t)) send(p, packet);
-    }
-
-    static void ping(ServerPlayer p, boolean faction) {
-        var d = ClaimData.get(p.server);
-        ClaimData.Claim c = null;
-        if (faction) {
-            var f = d.factionOf(p.getUUID());
-            if (f != null && f.home != null) c = d.claims.get(f.home);
-        } else {
-            if (p.getPersistentData().hasUUID("QuickClaimHome"))
-                c = d.claims.get(p.getPersistentData().getUUID("QuickClaimHome"));
-            if (c == null)
-                c =
-                        d.claims.values().stream()
-                                .filter(v -> !v.faction && v.owner.equals(p.getUUID()))
-                                .findFirst()
-                                .orElse(null);
-            if (c != null && (c.faction || !c.owner.equals(p.getUUID()))) c = null;
-        }
-        if (c == null) {
-            ClaimService.tell(p, "Choose Set main claim in your claim lectern's Claims tab.");
-            return;
-        }
-        CompoundTag t = new CompoundTag();
-        t.putString("Kind", "ping");
-        t.putString("Name", c.name);
-        t.putString("Dimension", c.dimension);
-        t.putInt("X", c.box.minX() + (c.box.maxX() - c.box.minX()) / 2);
-        t.putInt("Y", c.box.minY() + (c.box.maxY() - c.box.minY()) / 2);
-        t.putInt("Z", c.box.minZ() + (c.box.maxZ() - c.box.minZ()) / 2);
-        send(p, t);
     }
 }

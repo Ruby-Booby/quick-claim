@@ -1,6 +1,7 @@
 package dev.quickclaim.client;
 
 import com.mojang.logging.LogUtils;
+import com.mojang.math.Axis;
 
 import dev.quickclaim.Network;
 import dev.quickclaim.QuickClaim;
@@ -16,24 +17,28 @@ import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 
-import org.joml.Vector4d;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = QuickClaim.ID, value = Dist.CLIENT)
 public final class AtlasOverlay {
     private static final String SCREEN = "pepjebs.mapatlases.client.screen.AtlasOverviewScreen";
     private static final List<CompoundTag> pending = new ArrayList<>();
+    private static final Map<Class<?>, SliceAccess> access = new HashMap<>();
     private static List<CompoundTag> claims = List.of();
-    private static Access access;
     private static boolean failed;
     private static int ticks;
-    private static Object previousScreen;
+    private static String hovered;
 
     private AtlasOverlay() {}
 
@@ -50,163 +55,208 @@ public final class AtlasOverlay {
     public static void disconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         pending.clear();
         claims = List.of();
-        previousScreen = null;
+        hovered = null;
         ticks = 0;
     }
 
     @SubscribeEvent
     public static void tick(TickEvent.ClientTickEvent event) {
-        var screen = Minecraft.getInstance().screen;
-        if (event.phase != TickEvent.Phase.END) return;
-        if (screen == null || !screen.getClass().getName().equals(SCREEN)) {
-            previousScreen = null;
-            return;
-        }
-        if (screen != previousScreen || ++ticks >= 100) {
-            previousScreen = screen;
-            ticks = 0;
+        if (event.phase != TickEvent.Phase.END
+                || Minecraft.getInstance().player == null
+                || !ModList.get().isLoaded("map_atlases")) return;
+        if (ticks-- <= 0) {
+            ticks = 99;
             Network.CHANNEL.sendToServer(new Network.Action(6));
         }
     }
 
     @SubscribeEvent
-    public static void render(ScreenEvent.Render.Post event) {
-        var screen = event.getScreen();
-        if (failed || !screen.getClass().getName().equals(SCREEN)) return;
+    public static void beforeScreen(ScreenEvent.Render.Pre event) {
+        hovered = null;
+    }
+
+    @SubscribeEvent
+    public static void afterScreen(ScreenEvent.Render.Post event) {
+        if (hovered != null && event.getScreen().getClass().getName().equals(SCREEN))
+            event.getGuiGraphics()
+                    .renderTooltip(
+                            Minecraft.getInstance().font,
+                            Component.literal(hovered),
+                            event.getMouseX(),
+                            event.getMouseY());
+    }
+
+    public static void draw(
+            Object widget,
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int width,
+            int height,
+            double centerX,
+            double centerZ,
+            double scale,
+            float rotation) {
+        if (failed || claims.isEmpty() || !Double.isFinite(scale) || scale <= 0) return;
         try {
-            if (access == null) access = new Access(screen.getClass());
-            access.draw(screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+            var adapter = access.get(widget.getClass());
+            if (adapter == null) {
+                adapter = new SliceAccess(widget.getClass());
+                access.put(widget.getClass(), adapter);
+            }
+            Object slice = adapter.slice(widget);
+            if (slice == null) return;
+            String dimension =
+                    ((ResourceKey<?>) adapter.dimension.invoke(slice)).location().toString();
+            Integer mapHeight = (Integer) adapter.height.invoke(slice);
+            render(
+                    graphics,
+                    x,
+                    y,
+                    width,
+                    height,
+                    centerX,
+                    centerZ,
+                    scale,
+                    rotation,
+                    dimension,
+                    mapHeight,
+                    adapter.worldMap);
         } catch (ReflectiveOperationException | RuntimeException exception) {
             failed = true;
-            LogUtils.getLogger()
-                    .warn(
-                            "Atlas claim overlay is unavailable for this Map Atlases version",
-                            exception);
+            LogUtils.getLogger().warn("Unable to draw claims on this Atlas version", exception);
             var player = Minecraft.getInstance().player;
             if (player != null)
                 player.displayClientMessage(
                         Component.literal(
-                                "Quick Claim: this Atlas version does not support the claim"
-                                        + " overlay."),
+                                "Quick Claim: claim borders are unavailable for this Atlas"
+                                    + " version."),
                         false);
         }
     }
 
-    private static Field field(Class<?> type, String name) throws NoSuchFieldException {
-        for (Class<?> current = type; current != null; current = current.getSuperclass()) {
-            try {
-                var field = current.getDeclaredField(name);
-                field.setAccessible(true);
-                return field;
-            } catch (NoSuchFieldException ignored) {
+    private static void render(
+            GuiGraphics graphics,
+            int x,
+            int y,
+            int width,
+            int height,
+            double centerX,
+            double centerZ,
+            double scale,
+            float rotation,
+            String dimension,
+            Integer mapHeight,
+            boolean worldMap) {
+        var minecraft = Minecraft.getInstance();
+        var window = minecraft.getWindow();
+        float mouseX =
+                (float)
+                        (minecraft.mouseHandler.xpos()
+                                * window.getGuiScaledWidth()
+                                / window.getScreenWidth());
+        float mouseY =
+                (float)
+                        (minecraft.mouseHandler.ypos()
+                                * window.getGuiScaledHeight()
+                                / window.getScreenHeight());
+        var mouse =
+                new Matrix4f(graphics.pose().last().pose())
+                        .invert()
+                        .transformPosition(new Vector3f(mouseX, mouseY, 0));
+        boolean inside =
+                worldMap
+                        && mouse.x >= x
+                        && mouse.x < x + width
+                        && mouse.y >= y
+                        && mouse.y < y + height;
+        graphics.pose().pushPose();
+        graphics.pose().translate(x + width / 2f, y + height / 2f, 10);
+        graphics.pose().mulPose(Axis.ZP.rotationDegrees(rotation));
+        mouse =
+                new Matrix4f(graphics.pose().last().pose())
+                        .invert()
+                        .transformPosition(new Vector3f(mouseX, mouseY, 0));
+        double radius = Math.hypot(width, height) / (2 * scale);
+        try {
+            for (var claim : claims) {
+                int[] b = claim.getIntArray("Bounds");
+                if (b.length != 6
+                        || !dimension.equals(claim.getString("Dimension"))
+                        || (mapHeight != null && (mapHeight < b[1] || mapHeight > b[4]))
+                        || b[3] + 1d < centerX - radius
+                        || b[0] > centerX + radius
+                        || b[5] + 1d < centerZ - radius
+                        || b[2] > centerZ + radius) continue;
+                int x1 = pixel((b[0] - centerX) * scale), y1 = pixel((b[2] - centerZ) * scale);
+                int x2 = Math.max(x1 + 1, pixel(Math.ceil((b[3] + 1d - centerX) * scale)));
+                int y2 = Math.max(y1 + 1, pixel(Math.ceil((b[5] + 1d - centerZ) * scale)));
+                int color = claim.getBoolean("Protected") ? claim.getInt("Color") : 0xFF999999;
+                graphics.fill(x1, y1, x2, y2, (color & 0xFFFFFF) | 0x22000000);
+                graphics.fill(x1, y1, x2, y1 + 1, color);
+                graphics.fill(x1, y2 - 1, x2, y2, color);
+                graphics.fill(x1, y1, x1 + 1, y2, color);
+                graphics.fill(x2 - 1, y1, x2, y2, color);
+                if (claim.getBoolean("Home")) {
+                    int cx = pixel(((b[0] + (double) b[3] + 1) / 2 - centerX) * scale);
+                    int cy = pixel(((b[2] + (double) b[5] + 1) / 2 - centerZ) * scale);
+                    graphics.pose().pushPose();
+                    graphics.pose().translate(cx, cy, 1);
+                    graphics.pose().mulPose(Axis.ZP.rotationDegrees(-rotation));
+                    graphics.fill(-3, -2, 4, 4, 0xFF29232F);
+                    graphics.fill(-2, -1, 3, 3, color);
+                    graphics.fill(-1, -4, 2, -3, color);
+                    graphics.fill(-2, -3, 3, -2, color);
+                    graphics.pose().popPose();
+                }
+                if (inside && mouse.x >= x1 && mouse.x < x2 && mouse.y >= y1 && mouse.y < y2)
+                    hovered =
+                            claim.getString("Name")
+                                    + " | Y "
+                                    + b[1]
+                                    + " to "
+                                    + b[4]
+                                    + (claim.getBoolean("Home") ? " | Home" : "")
+                                    + (claim.getBoolean("Protected") ? "" : " | Unprotected");
             }
+        } finally {
+            graphics.pose().popPose();
         }
-        throw new NoSuchFieldException(type.getName() + "." + name);
     }
 
-    private static final class Access {
-        private final Field widget, x, y, width, height, centerX, centerZ, zoom, blocks;
-        private final Method transform, slice, dimension, sliceHeight, editing;
+    private static int pixel(double value) {
+        return (int) Math.floor(Math.max(-1_000_000, Math.min(1_000_000, value)));
+    }
 
-        Access(Class<?> screen) throws ReflectiveOperationException {
-            widget = field(screen, "mapWidget");
-            var type = widget.getType();
-            x = field(type, "x");
-            y = field(type, "y");
-            width = field(type, "width");
-            height = field(type, "height");
-            centerX = field(type, "currentXCenter");
-            centerZ = field(type, "currentZCenter");
-            zoom = field(type, "zoomLevel");
-            blocks = field(type, "mapBlocksSize");
-            transform = screen.getMethod("transformPos", double.class, double.class);
-            slice = screen.getMethod("getSelectedSlice");
-            dimension = slice.getReturnType().getMethod("dimension");
-            sliceHeight = slice.getReturnType().getMethod("height");
-            editing = screen.getMethod("isEditingText");
+    private static final class SliceAccess {
+        private final Field parent;
+        private final Method selected, dimension, height;
+        private final boolean worldMap;
+
+        SliceAccess(Class<?> widget) throws ReflectiveOperationException {
+            Field source = findField(widget, "mapScreen");
+            worldMap = source != null;
+            parent = worldMap ? source : findField(widget, "currentMapKey");
+            if (parent == null) throw new NoSuchFieldException(widget.getName() + " map context");
+            parent.setAccessible(true);
+            selected = parent.getType().getMethod(worldMap ? "getSelectedSlice" : "slice");
+            dimension = selected.getReturnType().getMethod("dimension");
+            height = selected.getReturnType().getMethod("height");
         }
 
-        void draw(Object screen, GuiGraphics graphics, int mouseX, int mouseY)
-                throws ReflectiveOperationException {
-            var map = widget.get(screen);
-            if (map == null || (boolean) editing.invoke(screen)) return;
-            var selectedSlice = slice.invoke(screen);
-            String dimensionId =
-                    ((ResourceKey<?>) dimension.invoke(selectedSlice)).location().toString();
-            Integer mapHeight = (Integer) sliceHeight.invoke(selectedSlice);
-            double left = x.getInt(map),
-                    top = y.getInt(map),
-                    w = width.getInt(map),
-                    h = height.getInt(map);
-            double scale = w / (zoom.getFloat(map) * blocks.getInt(map));
-            if (!Double.isFinite(scale) || scale <= 0) return;
-            var start = (Vector4d) transform.invoke(screen, left, top);
-            var end = (Vector4d) transform.invoke(screen, left + w, top + h);
-            String hovered = null;
-            graphics.enableScissor((int) start.x, (int) start.y, (int) end.x, (int) end.y);
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 0, 400);
-            try {
-                for (var claim : claims) {
-                    if (!claim.getString("Dimension").equals(dimensionId)) continue;
-                    int[] b = claim.getIntArray("Bounds");
-                    if (b.length != 6
-                            || (mapHeight != null && (mapHeight < b[1] || mapHeight > b[4])))
-                        continue;
-                    var a =
-                            (Vector4d)
-                                    transform.invoke(
-                                            screen,
-                                            left + w / 2 + (b[0] - centerX.getDouble(map)) * scale,
-                                            top + h / 2 + (b[2] - centerZ.getDouble(map)) * scale);
-                    var z =
-                            (Vector4d)
-                                    transform.invoke(
-                                            screen,
-                                            left
-                                                    + w / 2
-                                                    + (b[3] + 1d - centerX.getDouble(map)) * scale,
-                                            top
-                                                    + h / 2
-                                                    + (b[5] + 1d - centerZ.getDouble(map)) * scale);
-                    if (z.x < start.x || z.y < start.y || a.x > end.x || a.y > end.y) continue;
-                    int x1 = (int) Math.floor(a.x),
-                            y1 = (int) Math.floor(a.y),
-                            x2 = Math.max(x1 + 1, (int) Math.ceil(z.x)),
-                            y2 = Math.max(y1 + 1, (int) Math.ceil(z.y));
-                    int color = claim.getBoolean("Protected") ? claim.getInt("Color") : 0xFF999999;
-                    graphics.fill(x1, y1, x2, y2, (color & 0xFFFFFF) | 0x22000000);
-                    graphics.fill(x1, y1, x2, y1 + 1, color);
-                    graphics.fill(x1, y2 - 1, x2, y2, color);
-                    graphics.fill(x1, y1, x1 + 1, y2, color);
-                    graphics.fill(x2 - 1, y1, x2, y2, color);
-                    if (claim.getBoolean("Home")) {
-                        int cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
-                        graphics.fill(cx - 3, cy - 2, cx + 4, cy + 4, 0xFF29232F);
-                        graphics.fill(cx - 2, cy - 1, cx + 3, cy + 3, color);
-                        graphics.fill(cx - 1, cy - 4, cx + 2, cy - 3, color);
-                        graphics.fill(cx - 2, cy - 3, cx + 3, cy - 2, color);
-                    }
-                    if (mouseX >= Math.max(a.x, start.x)
-                            && mouseX < Math.min(z.x, end.x)
-                            && mouseY >= Math.max(a.y, start.y)
-                            && mouseY < Math.min(z.y, end.y))
-                        hovered =
-                                claim.getString("Name")
-                                        + " | Y "
-                                        + b[1]
-                                        + " to "
-                                        + b[4]
-                                        + (claim.getBoolean("Home") ? " | Home" : "")
-                                        + (claim.getBoolean("Protected") ? "" : " | Unprotected");
+        private static Field findField(Class<?> type, String name) {
+            for (Class<?> current = type; current != null; current = current.getSuperclass()) {
+                try {
+                    return current.getDeclaredField(name);
+                } catch (NoSuchFieldException ignored) {
                 }
-            } finally {
-                graphics.pose().popPose();
-                graphics.disableScissor();
             }
-            if (hovered != null)
-                graphics.renderTooltip(
-                        Minecraft.getInstance().font, Component.literal(hovered), mouseX, mouseY);
+            return null;
+        }
+
+        Object slice(Object widget) throws ReflectiveOperationException {
+            var value = parent.get(widget);
+            return value == null ? null : selected.invoke(value);
         }
     }
 }

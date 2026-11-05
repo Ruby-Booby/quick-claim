@@ -330,7 +330,9 @@ public final class ProtectionEvents {
             if (!Objects.equals(lastClaim.get(p.getUUID()), id)) {
                 if (c != null) {
                     p.connection.send(new ClientboundSetTitlesAnimationPacket(5, 35, 10));
-                    p.connection.send(new ClientboundSetTitleTextPacket(Component.literal(c.name)));
+                    p.connection.send(
+                            new ClientboundSetTitleTextPacket(
+                                    ClaimService.claimTitle(ClaimData.get(p.server), c)));
                 }
                 if (id == null) lastClaim.remove(p.getUUID());
                 else lastClaim.put(p.getUUID(), id);

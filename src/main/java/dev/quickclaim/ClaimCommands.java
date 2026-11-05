@@ -18,6 +18,36 @@ public final class ClaimCommands {
     public static void register(RegisterCommandsEvent e) {
         e.getDispatcher()
                 .register(
+                        Commands.literal("ping")
+                                .executes(
+                                        c ->
+                                                ClaimNavigation.ping(
+                                                        c.getSource().getPlayerOrException(),
+                                                        "personal"))
+                                .then(
+                                        Commands.argument(
+                                                        "claim", StringArgumentType.greedyString())
+                                                .suggests(
+                                                        (c, builder) ->
+                                                                net.minecraft.commands
+                                                                        .SharedSuggestionProvider
+                                                                        .suggest(
+                                                                                ClaimNavigation
+                                                                                        .choices(
+                                                                                                c.getSource()
+                                                                                                        .getPlayerOrException()),
+                                                                                builder))
+                                                .executes(
+                                                        c ->
+                                                                ClaimNavigation.ping(
+                                                                        c.getSource()
+                                                                                .getPlayerOrException(),
+                                                                        StringArgumentType
+                                                                                .getString(
+                                                                                        c,
+                                                                                        "claim")))));
+        e.getDispatcher()
+                .register(
                         Commands.literal("claim")
                                 .executes(
                                         c -> {

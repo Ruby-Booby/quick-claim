@@ -1,46 +1,58 @@
 # Quick Claim
 
-Mark out land with a wand, then use a claim lectern to manage it. Quick Claim runs on Minecraft 1.20.1 with Forge 47.4.0 or later in the 47.x series and Java 17.
+Claim land with a wand and manage it from an Amethyst Claim Lectern. Includes personal claims, factions, a shared upkeep vault, and admin controls.
 
-Get the JAR from this repository's Releases page. Put the same version in the server's and each player's `mods` folder. Remove older Quick Claim JARs first.
+Requires Minecraft 1.20.1, Forge 47.4.0 or newer in the 47.x series, and Java 17. Download the JAR from the repository's Releases page and put the same version in the server's and each player's `mods` folder. Remove the old Quick Claim JAR when updating.
 
 ## Claiming land
 
-Use the Claim Wand on one corner, then sneak-use it on the other. Both corners set the height as well as the width and length. Right-click an Amethyst Claim Lectern to open the menu and claim the selection.
+Use the Claim Wand on the first corner, then sneak-use it on the second. The selection includes the height between those corners. Right-click a claim lectern to claim the selected area.
 
-The Claims tab lets you rename a claim, change its permissions, or add, cut out, and replace areas with another wand selection. Set a main claim there to use the home ping. The default keys are `P` for your personal home and `O` for your faction's home; both can be changed in Controls.
+In the Claims tab, you can rename a claim, set permissions, or change its shape. Select another area with the wand to add land, cut some out, or replace the existing area.
 
-Personal claims start with an allowance of 2,560 horizontal blocks. You can trust four other players to use blocks and open your vault. Trust alone doesn't let them build, break blocks, or manage the claim.
+Personal claims start with 2,560 blocks of horizontal area. You can trust four other players to use blocks and open the vault. Being trusted doesn't grant building, breaking, or claim-management permissions.
 
-## Factions and payment
+## Finding home
 
-A player can belong to one faction and still keep personal claims. Factions have no member limit. The owner sends invitations, changes the title and its hex color, removes members, and appoints up to four managers.
+Choose **Set main claim** in the Claims tab. Press `P` to ping your personal home or `O` for your faction's home. Both keys can be changed in Controls.
 
-Members can build on faction land. The owner and managers can also edit claims, change permissions, and open the faction vault. That vault holds the items used for upkeep.
+The same ping is available through commands:
 
-The defaults are:
+- `/ping` or `/ping personal` â€” your personal main claim.
+- `/ping faction` â€” your faction's main claim.
+- `/ping <main claim name>` â€” either home by name, including names with spaces.
 
-- 200 diamonds to create a faction, then a payment every 30 real days.
-- An extra 50 diamonds per payment at 10 members, then another 50 for each five members after that.
-- 2,560 horizontal blocks of claim space, plus 256 for every member after the owner. Pending invitations add no space.
+Pings last 15 seconds. They only point to your personal or faction main claim.
 
-Leave payment items in the faction vault. If a payment is missed, protection and expansion stay available for seven real days. After that, protection stops and the faction can't expand until its debt is paid. Its saved claims are kept. Offline time counts toward these dates.
+## Factions
 
-The lectern must be inside the faction's claim before it can open the vault. If that lectern is removed, the stored items remain available through a replacement lectern on the faction's land. Personal vaults have no upkeep.
+You can join one faction and keep your personal claims. Factions have no member limit. The owner invites players, removes members, changes the faction title and hex color, and appoints up to four managers.
+
+Members can build on faction land. The owner and managers can also edit claims, change permissions, and use the shared vault. When anyone enters faction land, the claim popup uses that faction's color.
+
+A new faction gets 2,560 blocks of horizontal claim area. Each member after the owner adds another 256 blocks. Invitations don't add space until they're accepted.
+
+## Upkeep
+
+By default, creating a faction costs 200 diamonds. Upkeep is due every 30 real days. At 10 members, the payment rises to 250 diamonds, then increases by another 50 for each five members after that.
+
+Put payment items in the faction vault. Missed payments have a seven-day grace period: protection stays on and the faction can still expand. After seven days, protection and expansion stop until the debt is paid. The claims remain saved. Time spent offline counts too.
+
+Open the vault through a lectern inside the faction's land. If the lectern is removed, another lectern on that land can access the same items. Personal vaults don't have upkeep.
 
 ## Admin controls
 
-OP level 2 unlocks the Admin tab. It has server-owned claims, a bypass toggle, PvP overrides, area allowances, and payment settings. Server claims don't need upkeep.
+OP level 2 unlocks the Admin tab. It includes server claims, a protection bypass, PvP overrides, claim allowances, and payment settings. Server claims have no upkeep, and the bypass resets when you log out.
 
-To change the currency, click an item in your inventory in the payment editor. Drag the sliders or type the amount and interval. The limits are 1-10,000 items and 1-365 real days. Already accrued charges keep their price.
+In the payment editor, click an inventory item to use it as currency. Drag the sliders or type the amount and interval: 1â€“10,000 items and 1â€“365 real days. Existing charges keep their original price.
 
-Claim permissions cover visitors' block use, placement, breaking, PvP, hostile spawning, and mob griefing. Passive mobs still spawn. Admin PvP overrides take priority. The bypass resets on logout. Command shortcuts are available under `/claim` and `/faction`.
+Claim permissions control visitors' block use, placing, breaking, PvP, hostile spawning, and mob griefing. Passive mobs still spawn. Admin PvP overrides take priority over claim settings. Other command shortcuts are under `/claim` and `/faction`.
 
-## Recipes
+## Crafting
 
-For the wand, put an amethyst shard in the top-right slot and a stick in the bottom-left slot of a 2x2 crafting grid.
+For the wand, place an amethyst shard in the top-right slot and a stick in the bottom-left slot of a 2Ã—2 crafting grid.
 
-The lectern recipe uses these three rows:
+For the lectern, use this 3Ã—3 recipe:
 
 ```text
 A B A
@@ -48,26 +60,20 @@ A B A
 G C G
 ```
 
-`A` is an amethyst shard, `B` a book, `L` a lectern, `G` a gold ingot, and `C` a chest. Leave the dots empty.
+`A`: amethyst shard Â· `B`: book Â· `L`: lectern Â· `G`: gold ingot Â· `C`: chest. Leave the dots empty.
 
-## Other mods
+## Atlas and Carry On
 
-Map Atlases 1.20-6.0.20 can show claim borders and home markers on its world map. It doesn't add those overlays to the minimap. Personal home markers belong to their owner; faction home markers are shared with members. Alignment across all Atlas settings still needs in-world testing.
+With Map Atlases 1.20-6.0.20, claim borders and home markers appear on the world map and minimap. Faction borders use the faction's hex color; unprotected claims appear gray. You see your own personal home marker and your faction's home marker. Borders follow map movement, zoom, rotation, dimension, and height slice. Claim data refreshes about every five seconds.
 
-Carry On 2.1.2.7 respects the claim's pickup and placement restrictions. The claim lectern itself can't be carried. Items carried at death near protected land are retained instead of being placed into the claim.
+Carry On 2.1.2.7 respects claim pickup and placement restrictions. Claim lecterns can't be carried. Items being carried at death near protected land are kept instead of placed into the claim.
 
-Neither mod is required. Other automation mods may bypass Forge's protection events. General fluid and fire spread, existing lingering potion clouds, and those bypasses still need testing in the intended modpack.
+Both mods are optional. Other automation mods can bypass Forge's protection events. Fluid and fire spread, existing lingering potion clouds, and interactions with other mods still need checking in your modpack.
 
-## Building and reading the code
+## Building
 
-Run `./gradlew build`, or `gradlew.bat build` on Windows. The mod JAR is written to `build/libs/`. `runClient` and `runServer` start development instances.
+Run `./gradlew build`, or `gradlew.bat build` on Windows. The JAR goes in `build/libs/`. Use `runClient` or `runServer` to start a development instance.
 
-The Java code is in `src/main/java/dev/quickclaim/`:
+Source is in `src/main/java/dev/quickclaim/`. `ClaimData` holds saved state; `ClaimService`, `ClaimCommands`, and `Management` handle player actions; `ProtectionEvents` checks permissions. `ClaimNavigation` handles home pings. Atlas data comes from `AtlasSync`, with drawing in `client/AtlasOverlay` and its hook in `mixin/AtlasWidgetMixin`.
 
-- `ClaimData` stores claims, factions, vaults, and payment state.
-- `ClaimService`, `ClaimCommands`, and `Management` handle player actions and access checks.
-- `ProtectionEvents` enforces claim rules through Forge events.
-- `Network` sends menu actions and claim data between the server and client.
-- `client/` contains the menus, pings, and Atlas overlay. `core/` contains area and billing calculations.
-
-Recipes, models, language entries, and block tags are in `src/main/resources/`.
+Menus are in `client/`, and area and payment calculations are in `core/`. Recipes, models, language entries, and block tags are in `src/main/resources/`.

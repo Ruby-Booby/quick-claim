@@ -11,6 +11,16 @@ import java.util.*;
 
 public final class ClaimService {
 
+    static Component claimTitle(ClaimData data, ClaimData.Claim claim) {
+        var title = Component.literal(claim.name);
+        var faction = claim.faction ? data.factions.get(claim.owner) : null;
+        if (faction != null) {
+            var color = TextColor.parseColor(faction.color);
+            if (color != null) title.withStyle(style -> style.withColor(color));
+        }
+        return title;
+    }
+
     public record Selection(String dimension, BlockPos first, BlockPos second) {}
 
     static final Map<UUID, Selection> SELECTIONS = new HashMap<>();
