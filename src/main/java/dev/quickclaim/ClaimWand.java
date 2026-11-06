@@ -7,14 +7,15 @@ import net.minecraft.world.item.context.UseOnContext;
 
 public final class ClaimWand extends Item {
 
-    public ClaimWand(Properties p) {
-        super(p);
+    public ClaimWand(Properties properties) {
+        super(properties);
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext c) {
-        if (c.getPlayer() instanceof ServerPlayer p)
-            ClaimService.corner(p, c.getClickedPos(), p.isShiftKeyDown());
-        return InteractionResult.sidedSuccess(c.getLevel().isClientSide);
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() instanceof ServerPlayer player) {
+            ClaimService.corner(player, context.getClickedPos(), player.isShiftKeyDown());
+        }
+        return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
     }
 }

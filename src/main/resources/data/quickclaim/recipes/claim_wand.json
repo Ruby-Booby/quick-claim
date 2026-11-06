@@ -1,18 +1,10 @@
 {
-  "key": {
-    "S": {
-      "item": "minecraft:stick"
-    },
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    }
-  },
   "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " A",
-    "S "
-  ],
-  "result": {
-    "item": "quickclaim:claim_wand"
-  }
+  "pattern": ["A", "G", "S"],
+  "key": {
+    "A": { "item": "minecraft:amethyst_shard" },
+    "G": { "item": "minecraft:gold_ingot" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "item": "quickclaim:claim_wand" }
 }

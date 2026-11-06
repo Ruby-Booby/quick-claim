@@ -6,7 +6,7 @@ Requires Minecraft 1.20.1, Forge 47.4.0 or newer in the 47.x series, and Java 17
 
 ## Claiming land
 
-Use the Claim Wand on the first corner, then sneak-use it on the second. The selection includes the height between those corners. Right-click a claim lectern to claim the selected area.
+Use the wand on one corner, then crouch and use it on the opposite corner. The corners set the height too. If both sit at floor level, you claim only that layer. Right-click a claim lectern to claim the selected area.
 
 In the Claims tab, you can rename a claim, set permissions, or change its shape. Select another area with the wand to add land, cut some out, or replace the existing area.
 
@@ -18,9 +18,9 @@ Choose **Set main claim** in the Claims tab. Press `P` to ping your personal hom
 
 The same ping is available through commands:
 
-- `/ping` or `/ping personal` â€” your personal main claim.
-- `/ping faction` â€” your faction's main claim.
-- `/ping <main claim name>` â€” either home by name, including names with spaces.
+- `/ping` or `/ping personal` — your personal main claim.
+- `/ping faction` — your faction's main claim.
+- `/ping <main claim name>` — either home by name, including names with spaces.
 
 Pings last 15 seconds. They only point to your personal or faction main claim.
 
@@ -44,23 +44,22 @@ Open the vault through a lectern inside the faction's land. If the lectern is re
 
 OP level 2 unlocks the Admin tab. It includes server claims, a protection bypass, PvP overrides, claim allowances, and payment settings. Server claims have no upkeep, and the bypass resets when you log out.
 
-In the payment editor, click an inventory item to use it as currency. Drag the sliders or type the amount and interval: 1â€“10,000 items and 1â€“365 real days. Existing charges keep their original price.
+In the payment editor, click an inventory item to use it as currency. Drag the sliders or type the amount and interval: 1–10,000 items and 1–365 real days. Existing charges keep their original price.
 
 Claim permissions control visitors' block use, placing, breaking, PvP, hostile spawning, and mob griefing. Passive mobs still spawn. Admin PvP overrides take priority over claim settings. Other command shortcuts are under `/claim` and `/faction`.
 
 ## Crafting
 
-For the wand, place an amethyst shard in the top-right slot and a stick in the bottom-left slot of a 2Ã—2 crafting grid.
-
-For the lectern, use this 3Ã—3 recipe:
+At a crafting table, stack an amethyst shard (A), a gold ingot (G), and a stick (S) from top to bottom to make the wand. Leave the other slots empty.
 
 ```text
-A B A
-. L .
-G C G
+Wand       Lectern
+. A .      A B A
+. G .      . L .
+. S .      G C G
 ```
 
-`A`: amethyst shard Â· `B`: book Â· `L`: lectern Â· `G`: gold ingot Â· `C`: chest. Leave the dots empty.
+In the lectern pattern, B is a book, L is a lectern, and C is a chest.
 
 ## Atlas and Carry On
 

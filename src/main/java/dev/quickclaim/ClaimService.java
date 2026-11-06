@@ -47,26 +47,30 @@ public final class ClaimService {
         return p.hasPermissions(2) && BYPASS.contains(p.getUUID());
     }
 
-    public static void corner(ServerPlayer p, BlockPos pos, boolean second) {
-        Selection old = SELECTIONS.get(p.getUUID());
-        String dim = dimension(p);
-        if (second && (old == null || !old.dimension.equals(dim))) {
-            tell(p, "Select the first corner in this dimension first.");
+    public static void corner(ServerPlayer player, BlockPos pos, boolean second) {
+        var owner = player.getUUID();
+        String dimension = dimension(player);
+        if (!second) {
+            SELECTIONS.put(owner, new Selection(dimension, pos.immutable(), null));
+            tell(
+                    player,
+                    "First corner at "
+                            + pos.toShortString()
+                            + ". Crouch and use the wand on the opposite corner.");
             return;
         }
-        SELECTIONS.put(
-                p.getUUID(),
-                second
-                        ? new Selection(dim, old.first, pos.immutable())
-                        : new Selection(dim, pos.immutable(), null));
+
+        Selection selection = SELECTIONS.get(owner);
+        if (selection == null || !selection.dimension().equals(dimension)) {
+            tell(player, "Use the wand without crouching to start a selection in this dimension.");
+            return;
+        }
+        SELECTIONS.put(owner, new Selection(dimension, selection.first(), pos.immutable()));
         tell(
-                p,
-                (second ? "Second" : "First")
-                        + " corner: "
+                player,
+                "Second corner at "
                         + pos.toShortString()
-                        + (second
-                                ? ". Open your claim lectern to claim or edit the selection."
-                                : ". Sneak-use the wand for the second corner."));
+                        + ". Open your claim lectern to use this selection.");
     }
 
     public static int create(ServerPlayer p, boolean faction) {
