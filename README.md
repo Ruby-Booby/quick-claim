@@ -69,7 +69,7 @@ GeckoLib is optional. Without it, the same models render in their closed pose, a
 
 ## Atlas and Carry On
 
-With Map Atlases 1.20-6.0.20, claim borders and home markers appear on the world map and minimap. Faction borders use the faction's hex color; unprotected claims appear gray. You see your own personal home marker and your faction's home marker. Borders follow map movement, zoom, rotation, dimension, and height slice. Claim data refreshes about every five seconds.
+With Map Atlases 1.20-6.0.20, claim borders and home markers appear on the world map and minimap. Faction borders use the faction's hex color; unprotected claims appear gray. Your personal home appears as a small house, tinted to match its claim border. You also see your faction's home marker. Borders follow map movement, zoom, rotation, dimension, and height slice. Claim data refreshes about every five seconds.
 
 Carry On 2.1.2.7 respects claim pickup and placement restrictions. Claim lecterns can't be carried. Items being carried at death near protected land are kept instead of placed into the claim.
 

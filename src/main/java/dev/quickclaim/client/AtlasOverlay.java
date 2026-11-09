@@ -33,6 +33,19 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = QuickClaim.ID, value = Dist.CLIENT)
 public final class AtlasOverlay {
     private static final String SCREEN = "pepjebs.mapatlases.client.screen.AtlasOverviewScreen";
+    private static final String[] HOUSE = {
+        "     #     ",
+        "    # #    ",
+        "   #   #   ",
+        "  #     #  ",
+        " #       # ",
+        "#         #",
+        " #       # ",
+        " #       # ",
+        " #  ###  # ",
+        " #  # #  # ",
+        " #### #### "
+    };
     private static final List<CompoundTag> pending = new ArrayList<>();
     private static final Map<Class<?>, SliceAccess> access = new HashMap<>();
     private static List<CompoundTag> claims = List.of();
@@ -130,7 +143,7 @@ public final class AtlasOverlay {
                 player.displayClientMessage(
                         Component.literal(
                                 "Quick Claim: claim borders are unavailable for this Atlas"
-                                    + " version."),
+                                        + " version."),
                         false);
         }
     }
@@ -203,10 +216,15 @@ public final class AtlasOverlay {
                     graphics.pose().pushPose();
                     graphics.pose().translate(cx, cy, 1);
                     graphics.pose().mulPose(Axis.ZP.rotationDegrees(-rotation));
-                    graphics.fill(-3, -2, 4, 4, 0xFF29232F);
-                    graphics.fill(-2, -1, 3, 3, color);
-                    graphics.fill(-1, -4, 2, -3, color);
-                    graphics.fill(-2, -3, 3, -2, color);
+                    if (claim.getBoolean("PersonalHome")) {
+                        drawHouse(graphics, 1, 0xBB151515);
+                        drawHouse(graphics, 0, color);
+                    } else {
+                        graphics.fill(-3, -2, 4, 4, 0xFF29232F);
+                        graphics.fill(-2, -1, 3, 3, color);
+                        graphics.fill(-1, -4, 2, -3, color);
+                        graphics.fill(-2, -3, 3, -2, color);
+                    }
                     graphics.pose().popPose();
                 }
                 if (inside && mouse.x >= x1 && mouse.x < x2 && mouse.y >= y1 && mouse.y < y2)
@@ -226,6 +244,17 @@ public final class AtlasOverlay {
 
     private static int pixel(double value) {
         return (int) Math.floor(Math.max(-1_000_000, Math.min(1_000_000, value)));
+    }
+
+    private static void drawHouse(GuiGraphics graphics, int offset, int color) {
+        for (int row = 0; row < HOUSE.length; row++) {
+            for (int column = 0; column < HOUSE[row].length(); column++) {
+                if (HOUSE[row].charAt(column) != '#') continue;
+                int x = column - 5 + offset;
+                int y = row - 5 + offset;
+                graphics.fill(x, y, x + 1, y + 1, color);
+            }
+        }
     }
 
     private static final class SliceAccess {

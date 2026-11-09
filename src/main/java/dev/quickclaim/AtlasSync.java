@@ -61,6 +61,8 @@ public final class AtlasSync {
                                 && claim.group.equals(faction.home));
         tag.putBoolean("Home", home && claim.id.equals(claim.group));
         tag.putBoolean(
+                "PersonalHome", tag.getBoolean("Home") && !claim.faction && !claim.serverClaim);
+        tag.putBoolean(
                 "Protected", faction == null || faction.canExpand(System.currentTimeMillis()));
         return tag;
     }
