@@ -1,353 +1,91 @@
 {
-  "textures": {
-    "gold": "minecraft:block/gold_block",
-    "crystal": "minecraft:block/amethyst_block",
-    "wood": "minecraft:block/dark_oak_planks",
-    "particle": "minecraft:block/amethyst_block"
-  },
   "parent": "minecraft:block/block",
+  "loader": "forge:obj",
+  "model": "quickclaim:models/item/claim_wand.obj",
+  "automatic_culling": false,
+  "flip_v": false,
+  "emissive_ambient": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "quickclaim:item/claim_wand"
+  },
   "display": {
-    "gui": {
-      "scale": [
-        0.9,
-        0.9,
-        0.9
-      ],
-      "rotation": [
-        0,
-        0,
-        -35
-      ]
-    },
     "thirdperson_righthand": {
-      "translation": [
-        0,
-        2,
-        0
-      ],
       "rotation": [
         0,
-        0,
+        31,
         0
-      ],
-      "scale": [
-        0.6,
-        0.6,
-        0.6
       ]
     },
-    "ground": {
-      "scale": [
-        0.5,
-        0.5,
-        0.5
-      ],
-      "translation": [
+    "thirdperson_lefthand": {
+      "rotation": [
         0,
-        3,
+        31,
         0
       ]
     },
     "firstperson_righthand": {
-      "translation": [
-        1,
-        3,
-        1
-      ],
       "rotation": [
         0,
-        -90,
-        25
+        31,
+        0
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        31,
+        0
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        -92
+      ],
+      "translation": [
+        0,
+        1,
+        1.75
+      ]
+    },
+    "gui": {
+      "rotation": [
+        177,
+        -10,
+        142
+      ],
+      "translation": [
+        2,
+        -2.75,
+        8
       ],
       "scale": [
-        0.65,
-        0.65,
-        0.65
+        1.7,
+        1.7,
+        1.7
+      ]
+    },
+    "head": {
+      "rotation": [
+        -35.5,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        8,
+        -7
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        39.25,
+        0
       ]
     }
   },
-  "elements": [
-    {
-      "to": [
-        8.75,
-        12,
-        8.75
-      ],
-      "from": [
-        7.25,
-        0,
-        7.25
-      ],
-      "faces": {
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#wood"
-        }
-      }
-    },
-    {
-      "to": [
-        9.25,
-        12,
-        9.25
-      ],
-      "from": [
-        6.75,
-        10,
-        6.75
-      ],
-      "faces": {
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#gold"
-        }
-      }
-    },
-    {
-      "to": [
-        9.5,
-        16,
-        9.5
-      ],
-      "from": [
-        6.5,
-        12,
-        6.5
-      ],
-      "faces": {
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        }
-      },
-      "rotation": {
-        "axis": "y",
-        "angle": 45,
-        "origin": [
-          8,
-          14,
-          8
-        ],
-        "rescale": false
-      }
-    },
-    {
-      "to": [
-        8.75,
-        17,
-        8.75
-      ],
-      "from": [
-        7.25,
-        16,
-        7.25
-      ],
-      "faces": {
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "north": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ],
-          "texture": "#crystal"
-        }
-      }
-    }
-  ]
+  "gui_light": "front"
 }

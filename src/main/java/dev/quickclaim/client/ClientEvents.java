@@ -55,6 +55,14 @@ public final class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void renderers(EntityRenderersEvent.RegisterRenderers event) {
+        if (net.minecraftforge.fml.ModList.get().isLoaded("geckolib")) {
+            event.registerBlockEntityRenderer(
+                    QuickClaim.CLAIM_BLOCK_ENTITY.get(), context -> new AnimatedClaimRenderer());
+        }
+    }
+
+    @SubscribeEvent
     public static void keys(RegisterKeyMappingsEvent e) {
         e.register(MENU);
         e.register(PERSONAL);

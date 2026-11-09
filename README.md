@@ -61,6 +61,12 @@ Wand       Lectern
 
 In the lectern pattern, B is a book, L is a lectern, and C is a chest.
 
+## Models and animations
+
+The wand and claim lectern have custom models and textures. With GeckoLib 4.8.4 installed, the lectern's book opens when a player comes within three blocks, and its drawer opens while the vault is in use. The drawer stays open until the last viewer closes it.
+
+GeckoLib is optional. Without it, the same models render in their closed pose, and all claim and vault controls still work.
+
 ## Atlas and Carry On
 
 With Map Atlases 1.20-6.0.20, claim borders and home markers appear on the world map and minimap. Faction borders use the faction's hex color; unprotected claims appear gray. You see your own personal home marker and your faction's home marker. Borders follow map movement, zoom, rotation, dimension, and height slice. Claim data refreshes about every five seconds.
@@ -71,7 +77,7 @@ Both mods are optional. Other automation mods can bypass Forge's protection even
 
 ## Building
 
-Run `./gradlew build`, or `gradlew.bat build` on Windows. The JAR goes in `build/libs/`. Use `runClient` or `runServer` to start a development instance.
+Run `./gradlew build`, or `gradlew.bat build` on Windows. The JAR goes in `build/libs/`. Use `runClient` or `runServer` to start a development instance. Add `-Pgecko` to include GeckoLib.
 
 Source is in `src/main/java/dev/quickclaim/`. `ClaimData` holds saved state; `ClaimService`, `ClaimCommands`, and `Management` handle player actions; `ProtectionEvents` checks permissions. `ClaimNavigation` handles home pings. Atlas data comes from `AtlasSync`, with drawing in `client/AtlasOverlay` and its hook in `mixin/AtlasWidgetMixin`.
 

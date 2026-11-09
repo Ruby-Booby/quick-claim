@@ -1,0 +1,132 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "book_open": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "book_cover": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.75": {
+              "vector": [
+                0,
+                0,
+                -130
+              ],
+              "easing": "easeInElastic"
+            }
+          }
+        }
+      }
+    },
+    "book_close": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "book_cover": {
+          "rotation": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                -130
+              ]
+            },
+            "0.7083": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeOutQuart"
+            }
+          }
+        }
+      }
+    },
+    "drawer_open": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "drawer": {
+          "position": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                0
+              ]
+            },
+            "0.75": {
+              "vector": [
+                0,
+                0,
+                -9
+              ],
+              "easing": "easeInBounce",
+              "easingArgs": [
+                0.1
+              ]
+            }
+          }
+        }
+      }
+    },
+    "drawer_close": {
+      "loop": "hold_on_last_frame",
+      "animation_length": 1,
+      "bones": {
+        "drawer": {
+          "position": {
+            "0.0": {
+              "vector": [
+                0,
+                0,
+                -9
+              ]
+            },
+            "0.4167": {
+              "vector": [
+                0,
+                0,
+                0
+              ],
+              "easing": "easeInBack"
+            }
+          }
+        }
+      }
+    },
+    "book_closed": {
+      "loop": true,
+      "bones": {
+        "book_cover": {
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "drawer_closed": {
+      "loop": true,
+      "bones": {
+        "drawer": {
+          "position": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

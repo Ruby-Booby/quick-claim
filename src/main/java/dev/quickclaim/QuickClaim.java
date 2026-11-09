@@ -50,7 +50,7 @@ public final class QuickClaim {
             ENTITIES.register(
                     "claim_block",
                     () ->
-                            BlockEntityType.Builder.of(ClaimBlock.Entity::new, CLAIM_BLOCK.get())
+                            BlockEntityType.Builder.of(ClaimBlock::createEntity, CLAIM_BLOCK.get())
                                     .build(null));
 
     public static final RegistryObject<MenuType<PaymentMenu>> PAYMENT_MENU =

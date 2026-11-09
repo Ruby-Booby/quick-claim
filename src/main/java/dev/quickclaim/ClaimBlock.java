@@ -2,27 +2,36 @@ package dev.quickclaim;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
+import net.minecraftforge.fml.ModList;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public final class ClaimBlock extends BaseEntityBlock {
 
     private static final VoxelShape SHAPE =
             Shapes.or(
-                    Block.box(1, 0, 1, 15, 2, 15),
-                    Block.box(4, 2, 4, 12, 13, 12),
-                    Block.box(0, 12, 0, 16, 16, 16));
+                    Block.box(0, 0, 0, 16, 1.25, 16),
+                    Block.box(1.2, 1, 0.4, 14.8, 14.25, 15.1),
+                    Block.box(0, 14, 0, 16, 17, 16));
 
     public ClaimBlock(Properties properties) {
         super(properties);
@@ -64,12 +73,28 @@ public final class ClaimBlock extends BaseEntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new Entity(pos, state);
+        return createEntity(pos, state);
+    }
+
+    static Entity createEntity(BlockPos pos, BlockState state) {
+        return ModList.get().isLoaded("geckolib")
+                ? dev.quickclaim.compat.GeckoCompat.create(pos, state)
+                : new Entity(pos, state);
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide
+                ? null
+                : createTickerHelper(type, QuickClaim.CLAIM_BLOCK_ENTITY.get(), Entity::tick);
     }
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return ModList.get().isLoaded("geckolib")
+                ? RenderShape.ENTITYBLOCK_ANIMATED
+                : RenderShape.MODEL;
     }
 
     @Override
@@ -139,8 +164,7 @@ public final class ClaimBlock extends BaseEntityBlock {
         player.openMenu(
                 new SimpleMenuProvider(
                         (id, inventory, who) ->
-                                new ChestMenu(
-                                        MenuType.GENERIC_9x3, id, inventory, faction.treasury, 3) {
+                                new VaultMenu(id, inventory, faction.treasury, entity) {
 
                                     @Override
                                     public boolean stillValid(Player who) {
@@ -186,11 +210,11 @@ public final class ClaimBlock extends BaseEntityBlock {
         }
         var inventory = data.vault(claim.owner);
         var level = player.serverLevel();
-        var entity = level.getBlockEntity(pos);
+        if (!(level.getBlockEntity(pos) instanceof Entity entity)) return;
         player.openMenu(
                 new SimpleMenuProvider(
                         (id, slots, who) ->
-                                new ChestMenu(MenuType.GENERIC_9x3, id, slots, inventory, 3) {
+                                new VaultMenu(id, slots, inventory, entity) {
                                     @Override
                                     public boolean stillValid(Player who) {
                                         var current = data.at(ClaimService.dimension(player), pos);
@@ -228,12 +252,83 @@ public final class ClaimBlock extends BaseEntityBlock {
         super.onRemove(state, level, pos, replacement, moving);
     }
 
-    public static final class Entity extends BlockEntity {
+    private static class VaultMenu extends ChestMenu {
+        private final Entity lectern;
+
+        VaultMenu(int id, Inventory inventory, Container storage, Entity lectern) {
+            super(MenuType.GENERIC_9x3, id, inventory, storage, 3);
+            this.lectern = lectern;
+            lectern.viewers.add(inventory.player.getUUID());
+            lectern.updateDrawer();
+        }
+
+        @Override
+        public void removed(Player player) {
+            super.removed(player);
+            lectern.viewers.remove(player.getUUID());
+            lectern.updateDrawer();
+        }
+    }
+
+    public static class Entity extends BlockEntity {
 
         UUID faction;
+        private final Set<UUID> viewers = new HashSet<>();
+        private boolean drawerOpen;
 
         public Entity(BlockPos pos, BlockState state) {
             super(QuickClaim.CLAIM_BLOCK_ENTITY.get(), pos, state);
+        }
+
+        public boolean isDrawerOpen() {
+            return drawerOpen;
+        }
+
+        private void updateDrawer() {
+            boolean open = !viewers.isEmpty();
+            if (drawerOpen == open || level == null || level.isClientSide) return;
+            drawerOpen = open;
+            level.sendBlockUpdated(
+                    worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+
+        private static void tick(Level level, BlockPos pos, BlockState state, Entity entity) {
+            if (entity.viewers.isEmpty() || level.getGameTime() % 20 != 0) return;
+            entity.viewers.removeIf(
+                    id -> {
+                        Player player = level.getPlayerByUUID(id);
+                        return player == null
+                                || !(player.containerMenu instanceof VaultMenu menu)
+                                || menu.lectern != entity;
+                    });
+            entity.updateDrawer();
+        }
+
+        @Override
+        public CompoundTag getUpdateTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putBoolean("DrawerOpen", drawerOpen);
+            return tag;
+        }
+
+        @Override
+        public void handleUpdateTag(CompoundTag tag) {
+            drawerOpen = tag.getBoolean("DrawerOpen");
+        }
+
+        @Override
+        public ClientboundBlockEntityDataPacket getUpdatePacket() {
+            return ClientboundBlockEntityDataPacket.create(this);
+        }
+
+        @Override
+        public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
+            if (packet.getTag() != null) handleUpdateTag(packet.getTag());
+        }
+
+        @Override
+        public AABB getRenderBoundingBox() {
+            return new AABB(worldPosition).inflate(1);
         }
 
         @Override

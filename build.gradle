@@ -14,6 +14,10 @@ minecraft {
         configureEach {
             workingDirectory project.file('run')
             args '--mixin.config', 'quickclaim.mixins.json'
+            if (providers.gradleProperty('gecko').isPresent()) {
+                property 'mixin.env.remapRefMap', 'true'
+                property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            }
             mods {
                 quickclaim { source sourceSets.main }
             }
@@ -23,8 +27,16 @@ minecraft {
     }
 }
 
+repositories {
+    maven { url 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly fg.deobf('maven.modrinth:geckolib:aC5KMoNg')
+    if (providers.gradleProperty('gecko').isPresent()) {
+        runtimeOnly fg.deobf('maven.modrinth:geckolib:aC5KMoNg')
+    }
 }
 
 tasks.named('processResources', ProcessResources) {
