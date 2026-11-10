@@ -228,14 +228,7 @@ public final class AtlasOverlay {
                     graphics.pose().popPose();
                 }
                 if (inside && mouse.x >= x1 && mouse.x < x2 && mouse.y >= y1 && mouse.y < y2)
-                    hovered =
-                            claim.getString("Name")
-                                    + " | Y "
-                                    + b[1]
-                                    + " to "
-                                    + b[4]
-                                    + (claim.getBoolean("Home") ? " | Home" : "")
-                                    + (claim.getBoolean("Protected") ? "" : " | Unprotected");
+                    hovered = claim.getString("Name");
             }
         } finally {
             graphics.pose().popPose();
