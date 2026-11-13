@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'net.minecraftforge.gradle' version '6.0.54'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 
 group = mod_group_id
@@ -14,10 +15,8 @@ minecraft {
         configureEach {
             workingDirectory project.file('run')
             args '--mixin.config', 'quickclaim.mixins.json'
-            if (providers.gradleProperty('gecko').isPresent()) {
-                property 'mixin.env.remapRefMap', 'true'
-                property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-            }
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
             mods {
                 quickclaim { source sourceSets.main }
             }
@@ -28,16 +27,20 @@ minecraft {
 }
 
 repositories {
+    maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
     maven { url 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
 }
 
 dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly fg.deobf('maven.modrinth:geckolib:aC5KMoNg')
     if (providers.gradleProperty('gecko').isPresent()) {
         runtimeOnly fg.deobf('maven.modrinth:geckolib:aC5KMoNg')
     }
 }
+
+mixin { add sourceSets.main, 'quickclaim.refmap.json' }
 
 tasks.named('processResources', ProcessResources) {
     def properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version]

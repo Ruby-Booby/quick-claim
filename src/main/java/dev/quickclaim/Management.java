@@ -278,6 +278,7 @@ public final class Management {
                         case "place" -> part.publicPlace = !part.publicPlace;
                         case "pvp" -> part.pvp = !part.pvp;
                         case "mobGrief" -> part.mobGrief = !part.mobGrief;
+                        case "fireSpread" -> part.fireSpread = !part.fireSpread;
                         case "hostiles" -> part.hostileSpawns = !part.hostileSpawns;
                         default -> {}
                     }

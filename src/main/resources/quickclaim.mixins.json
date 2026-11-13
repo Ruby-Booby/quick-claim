@@ -3,6 +3,8 @@
   "minVersion": "0.8",
   "package": "dev.quickclaim.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "quickclaim.refmap.json",
+  "mixins": ["FireBlockMixin"],
   "client": ["AtlasWidgetMixin"],
   "injectors": { "defaultRequire": 1 }
 }

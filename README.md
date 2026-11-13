@@ -46,7 +46,9 @@ OP level 2 unlocks the Admin tab. It includes server claims, a protection bypass
 
 In the payment editor, click an inventory item to use it as currency. Drag the sliders or type the amount and interval: 1–10,000 items and 1–365 real days. Existing charges keep their original price.
 
-Claim permissions control visitors' block use, placing, breaking, PvP, hostile spawning, and mob griefing. Passive mobs still spawn. Admin PvP overrides take priority over claim settings. Other command shortcuts are under `/claim` and `/faction`.
+Claim permissions control visitors' block use, placing, breaking, PvP, hostile spawning, mob griefing, and fire spread. Passive mobs still spawn. Admin PvP overrides take priority over claim settings. Other command shortcuts are under `/claim` and `/faction`.
+
+Fire spread is off by default in claims. Turn it on in the claim permissions panel, or stand in your claim and use `/claim flag fireSpread true`. Use `false` to turn it off again. This covers spreading flames, burning blocks, and lava ignition. The world's `doFireTick` rule still applies.
 
 ## Crafting
 
@@ -73,7 +75,7 @@ With Map Atlases 1.20-6.0.20, claim borders and home markers appear on the world
 
 Carry On 2.1.2.7 respects claim pickup and placement restrictions. Claim lecterns can't be carried. Items being carried at death near protected land are kept instead of placed into the claim.
 
-Both mods are optional. Other automation mods can bypass Forge's protection events. Fluid and fire spread, existing lingering potion clouds, and interactions with other mods still need checking in your modpack.
+Both mods are optional. Other automation mods can bypass Forge's protection events. Fluid flow, existing lingering potion clouds, and interactions with other mods still need checking in your modpack.
 
 ## Building
 

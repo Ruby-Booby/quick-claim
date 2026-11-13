@@ -175,6 +175,7 @@ public final class ClaimCommands {
                                                                                             "place",
                                                                                             "pvp",
                                                                                             "mobGrief",
+                                                                                            "fireSpread",
                                                                                             "hostiles"))
                                                                                 b.suggest(s);
                                                                             return b.buildFuture();
@@ -538,6 +539,7 @@ public final class ClaimCommands {
                 case "place" -> part.publicPlace = value;
                 case "pvp" -> part.pvp = value;
                 case "mobGrief" -> part.mobGrief = value;
+                case "fireSpread" -> part.fireSpread = value;
                 case "hostiles" -> part.hostileSpawns = value;
                 default -> {
                     return ClaimService.fail(p, "Unknown flag.");

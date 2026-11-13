@@ -152,6 +152,7 @@ public final class ClaimData extends SavedData {
                 publicBreak,
                 publicPlace,
                 mobGrief,
+                fireSpread,
                 hostileSpawns = true;
 
         public int adminPvp = -1;
@@ -184,6 +185,7 @@ public final class ClaimData extends SavedData {
             t.putBoolean("Break", publicBreak);
             t.putBoolean("Place", publicPlace);
             t.putBoolean("MobGrief", mobGrief);
+            t.putBoolean("FireSpread", fireSpread);
             t.putBoolean("Hostiles", hostileSpawns);
             return t;
         }
@@ -207,6 +209,7 @@ public final class ClaimData extends SavedData {
             c.publicBreak = t.getBoolean("Break");
             c.publicPlace = t.getBoolean("Place");
             c.mobGrief = t.getBoolean("MobGrief");
+            c.fireSpread = t.getBoolean("FireSpread");
             c.hostileSpawns = t.getBoolean("Hostiles");
             return c;
         }

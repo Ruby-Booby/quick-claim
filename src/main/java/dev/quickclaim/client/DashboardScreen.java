@@ -229,7 +229,8 @@ public final class DashboardScreen extends Screen {
             toggle("PvP", "pvp", "Pvp", 165, 127, editable);
             toggle("Mob griefing", "mobGrief", "MobGrief", 10, 153, editable);
             toggle("Hostile spawning", "hostiles", "Hostiles", 165, 153, editable);
-            label("Members retain build/use access. Passive mobs spawn.", 10, 184);
+            toggle("Fire spread", "fireSpread", "FireSpread", 10, 179, editable);
+            label("Members retain build/use access. Passive mobs spawn.", 10, 208);
         }
     }
 

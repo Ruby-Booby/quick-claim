@@ -35,6 +35,11 @@ public final class ProtectionEvents {
         return !ClaimService.allowed(p, claim(p.level(), pos), action);
     }
 
+    public static boolean fireSpreadAllowed(Level level, BlockPos pos) {
+        var claim = claim(level, pos);
+        return claim == null || claim.fireSpread;
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void attackEntity(AttackEntityEvent event) {
         if (event.getEntity() instanceof ServerPlayer player
@@ -95,8 +100,19 @@ public final class ProtectionEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void fluidBlock(BlockEvent.FluidPlaceBlockEvent event) {
-        if (event.getLevel() instanceof Level level && claim(level, event.getPos()) != null)
+        if (!(event.getLevel() instanceof Level level)) return;
+        boolean fire =
+                event.getNewState().getBlock()
+                        instanceof net.minecraft.world.level.block.BaseFireBlock;
+        boolean blocked =
+                fire
+                        ? !fireSpreadAllowed(level, event.getPos())
+                                || !fireSpreadAllowed(level, event.getLiquidPos())
+                        : claim(level, event.getPos()) != null;
+        if (blocked) {
+            event.setNewState(event.getOriginalState());
             event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
