@@ -77,6 +77,8 @@ Carry On 2.1.2.7 respects claim pickup and placement restrictions. Claim lectern
 
 Both mods are optional. Other automation mods can bypass Forge's protection events. Fluid flow, existing lingering potion clouds, and interactions with other mods still need checking in your modpack.
 
+Quick Claim includes an optional startup fix for Abyssal Decor, Born in Chaos, Luminous Nether, and Unusual End. It queues their composter registrations on the main thread to avoid concurrent writes during loading. None of these mods is required; the fix is skipped when they are absent.
+
 ## Building
 
 Run `./gradlew build`, or `gradlew.bat build` on Windows. The JAR goes in `build/libs/`. Use `runClient` or `runServer` to start a development instance. Add `-Pgecko` to include GeckoLib.
